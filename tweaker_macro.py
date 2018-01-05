@@ -3,8 +3,9 @@
 import random
 
 SOFT_TOUCH_BUTTONS = [i for i in range (1, 38 + 1)]
+POTENTIOMETERS = [53, 54, 55]
 
-class RgbLedColor(object):
+class RgbLedColor:
     colors = {
     "OFF"     : 0,
     "GREEN"   : 1,
@@ -17,7 +18,7 @@ class RgbLedColor(object):
     }
     def __init__(self):
         self.setColorOff()
-        self.setUpdate()
+        self.update = False
     def getColor(self):
         return(self.color)
     def isUpdate(self):
@@ -52,12 +53,10 @@ class RgbLedColor(object):
         print(color)
         self.setColor(color)
 
-class RgbButton(object):
+class RgbButtonNote:
     def __init__(self, midi):
         self.midi = midi
-        self.state = False
-        self.color = RgbLedColor()
-        self.setUpdate()
+        self.update = False
     def getState(self):
         return(self.state)
     def setState(self, state):
@@ -65,6 +64,48 @@ class RgbButton(object):
         self.setUpdate()
     def getMidi(self):
         return(self.midi)
+    def isUpdate(self):
+        return(self.update)
+    def setUpdate(self):
+        self.update = True
+    def unsetUpdate(self):
+        self.update = False
+    def setMidi(self, midi):
+        self.midi = midi
+    def changeOctave(self, multiplier):
+        self.midi += multiplier * 12
+
+class RgbButton:
+    def __init__(self, midi):
+        self.midi = midi
+        self.state = False
+        self.update = False
+        self.color = RgbLedColor()
+        self.note = RgbButtonNote(midi)
+    def getState(self):
+        return(self.state)
+    def setState(self, state):
+        self.state = state
+        self.setUpdate()
+    def getMidi(self):
+        return(self.midi)
+    def isUpdate(self):
+        return(self.update)
+    def setUpdate(self):
+        self.update = True
+    def unsetUpdate(self):
+        self.update = False
+
+class Pot:
+    def __init__(self, midi):
+        self.midi = midi
+        self.value = 0
+        self.update = False
+    def getValue(self):
+        return(self.value)
+    def setValue(self, value):
+        self.value = value
+        self.setUpdate()
     def isUpdate(self):
         return(self.update)
     def setUpdate(self):

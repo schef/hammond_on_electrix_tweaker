@@ -38,9 +38,13 @@ except (EOFError, KeyboardInterrupt):
 ### Init start ###
 
 rgbButtons = {}
+pots = {}
 
 for midi in SOFT_TOUCH_BUTTONS:
     rgbButtons[midi] = RgbButton(midi)
+
+for midi in POTENTIOMETERS:
+    pots[midi] = Pot(midi)
 
 for key in rgbButtons:
     button = rgbButtons[key]
@@ -63,12 +67,23 @@ def updateButtons():
             midiout_led.send_message([NOTE_ON, button.getMidi(), button.color.getColor()])
             button.color.unsetUpdate()
 
+def updatePot():
+    for key in pots:
+         pot = pots[key]
+         if (pot.isUpdate()):
+           print(pot.getValue())
+           pot.unsetUpdate()
+
 def processMidi(message):
-    button = rgbButtons[message[1]]
-    if (message[2] == 127):
-        button.setState(True)
-    elif (message[2] == 0):
-        button.setState(False)
+    if message[1] in SOFT_TOUCH_BUTTONS:
+        button = rgbButtons[message[1]]
+        if (message[2] == 127):
+            button.setState(True)
+        elif (message[2] == 0):
+            button.setState(False)
+    elif message[1] in POTENTIOMETERS:
+        pot = pots[message[1]]
+        pot.setValue(message[2])
 
 ### Init end ###
 
@@ -92,6 +107,7 @@ try:
     while True:
         #time.sleep(1)
         updateButtons()
+        updatePot()
 except KeyboardInterrupt:
     print('')
 finally:
