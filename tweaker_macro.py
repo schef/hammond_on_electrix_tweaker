@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+import random
+
 SOFT_TOUCH_BUTTONS = [i for i in range (1, 38 + 1)]
 
 class RgbLedColor(object):
@@ -43,15 +45,29 @@ class RgbLedColor(object):
         self.setColor(self.colors["MAGENTA"])
     def setColorWhite(self):
         self.setColor(self.colors["WHITE"])
+    def setColorRandom(self):
+        colorList = list(self.colors.values())
+        colorList.remove(self.colors['OFF'])
+        color = random.choice(colorList)
+        print(color)
+        self.setColor(color)
 
 class RgbButton(object):
     def __init__(self, midi):
         self.midi = midi
         self.state = False
         self.color = RgbLedColor()
+        self.setUpdate()
     def getState(self):
         return(self.state)
     def setState(self, state):
         self.state = state
+        self.setUpdate()
     def getMidi(self):
         return(self.midi)
+    def isUpdate(self):
+        return(self.update)
+    def setUpdate(self):
+        self.update = True
+    def unsetUpdate(self):
+        self.update = False
