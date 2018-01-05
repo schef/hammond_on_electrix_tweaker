@@ -82,6 +82,9 @@ class RgbButton:
         self.update = False
         self.color = RgbLedColor()
         self.note = RgbButtonNote(midi)
+        self.row = int((midi - 1) / 8)
+        self.col = (midi - 1) % 8
+        print(self.row, self.col)
     def getState(self):
         return(self.state)
     def setState(self, state):
@@ -95,6 +98,10 @@ class RgbButton:
         self.update = True
     def unsetUpdate(self):
         self.update = False
+    def getRow(self):
+        return(self.row)
+    def getCol(self):
+        return(self.col)
 
 class Pot:
     def __init__(self, midi):

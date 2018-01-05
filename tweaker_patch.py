@@ -40,6 +40,30 @@ except (EOFError, KeyboardInterrupt):
 rgbButtons = {}
 pots = {}
 
+NOTE_BASE_G = 7
+NOTE_STRING_DIFF = 5
+OCTAVE = 5
+
+def colorNotes():
+    for key in rgbButtons:
+        button = rgbButtons[key]
+        # color black tones
+        if (button.getRow() in range(0, 4)):
+            if (button.note.getMidi() % 12 in [1, 3, 5, 8, 10]):
+                button.color.setColorGreen()
+        # color tone c
+        if (button.getRow() in range(0, 4)):
+            if (button.note.getMidi() % 12 == 0):
+                button.color.setColorRed()
+
+def setMidiNotes():
+    for key in rgbButtons:
+        button = rgbButtons[key]
+        # set notes based on bass
+        if (button.getRow() in range(0, 4)):
+            formula = NOTE_BASE_G + (OCTAVE * 12) - (NOTE_STRING_DIFF * button.getRow()) + button.getCol()
+            button.note.setMidi(formula)
+
 for midi in SOFT_TOUCH_BUTTONS:
     rgbButtons[midi] = RgbButton(midi)
 
@@ -49,6 +73,9 @@ for midi in POTENTIOMETERS:
 for key in rgbButtons:
     button = rgbButtons[key]
     button.color.setColorOff()
+    setMidiNotes()
+    colorNotes()
+
 
 def updateButtons():
     for key in rgbButtons:
@@ -56,11 +83,11 @@ def updateButtons():
         # notes
         if (button.isUpdate()):
             if (button.getState()):
-                midiout_notes.send_message([NOTE_ON, button.getMidi(), 127])
-                button.color.setColorRandom()
+                midiout_notes.send_message([NOTE_ON, button.note.getMidi(), 127])
+                #button.color.setColorRandom()
             else:
-                midiout_notes.send_message([NOTE_ON, button.getMidi(), 0])
-                button.color.setColorOff()
+                midiout_notes.send_message([NOTE_ON, button.note.getMidi(), 0])
+                #button.color.setColorOff()
             button.unsetUpdate()
         # color
         if (button.color.isUpdate()):
