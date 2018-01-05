@@ -108,6 +108,8 @@ class Pot:
         self.midi = midi
         self.value = 0
         self.update = False
+    def getMidi(self):
+        return(self.midi)
     def getValue(self):
         return(self.value)
     def setValue(self, value):

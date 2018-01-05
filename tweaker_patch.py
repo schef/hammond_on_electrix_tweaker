@@ -43,6 +43,8 @@ pots = {}
 NOTE_BASE_G = 7
 NOTE_STRING_DIFF = 5
 OCTAVE = 5
+STR_MOD = 0
+TONE_MOD = 0
 
 def colorNotes():
     for key in rgbButtons:
@@ -51,6 +53,8 @@ def colorNotes():
         if (button.getRow() in range(0, 4)):
             if (button.note.getMidi() % 12 in [1, 3, 5, 8, 10]):
                 button.color.setColorGreen()
+            else:
+                button.color.setColorWhite()
         # color tone c
         if (button.getRow() in range(0, 4)):
             if (button.note.getMidi() % 12 == 0):
@@ -61,7 +65,7 @@ def setMidiNotes():
         button = rgbButtons[key]
         # set notes based on bass
         if (button.getRow() in range(0, 4)):
-            formula = NOTE_BASE_G + (OCTAVE * 12) - (NOTE_STRING_DIFF * button.getRow()) + button.getCol()
+            formula = (NOTE_BASE_G + TONE_MOD) + (OCTAVE * 12) - (NOTE_STRING_DIFF * (button.getRow() + STR_MOD)) + button.getCol()
             button.note.setMidi(formula)
 
 for midi in SOFT_TOUCH_BUTTONS:
@@ -95,11 +99,24 @@ def updateButtons():
             button.color.unsetUpdate()
 
 def updatePot():
+    global STR_MOD
+    global TONE_MOD
     for key in pots:
          pot = pots[key]
          if (pot.isUpdate()):
-           print(pot.getValue())
-           pot.unsetUpdate()
+            if (pot.getMidi() == POTENTIOMETERS[0]):
+                str_mod = int(pot.getValue() / 16) - 4
+                STR_MOD = str_mod
+                setMidiNotes()
+                colorNotes()
+            elif (pot.getMidi() == POTENTIOMETERS[2]):
+                tone_mod = (int(pot.getValue() / 16) - 4) * -1
+                TONE_MOD = tone_mod
+                setMidiNotes()
+                colorNotes()
+            else:
+                print(pot.getValue())
+            pot.unsetUpdate()
 
 def processMidi(message):
     if message[1] in SOFT_TOUCH_BUTTONS:
@@ -108,7 +125,7 @@ def processMidi(message):
             button.setState(True)
         elif (message[2] == 0):
             button.setState(False)
-    elif message[1] in POTENTIOMETERS:
+    elif message[1] in POTENTIOMETERS and message[0] == 176:
         pot = pots[message[1]]
         pot.setValue(message[2])
 
