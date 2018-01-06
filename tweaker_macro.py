@@ -17,19 +17,17 @@ class RgbLedColor:
     "WHITE"   : 127
     }
     def __init__(self):
-        self.setColorOff()
         self.update = False
-    def getColor(self):
-        return(self.color)
+        self.setColorOff()
     def isUpdate(self):
         return(self.update)
-    def setUpdate(self):
+    def setUpdate(self, state):
         self.update = True
-    def unsetUpdate(self):
-        self.update = False
+    def getColor(self):
+        return(self.color)
     def setColor(self, color):
         self.color = color
-        self.setUpdate()
+        self.setUpdate(True)
     def setColorOff(self):
         self.setColor(self.colors["OFF"])
     def setColorGreen(self):
@@ -56,24 +54,23 @@ class RgbLedColor:
 class RgbButtonNote:
     def __init__(self, midi):
         self.midi = midi
+        self.state = False
         self.update = False
-    def getState(self):
+    def getMidi(self):
+        return(self.midi)
+    def setMidi(self, midi):
+        self.midi = midi
+    def isState(self):
         return(self.state)
     def setState(self, state):
         self.state = state
-        self.setUpdate()
-    def getMidi(self):
-        return(self.midi)
+        self.setUpdate(True)
     def isUpdate(self):
         return(self.update)
-    def setUpdate(self):
-        self.update = True
-    def unsetUpdate(self):
-        self.update = False
-    def setMidi(self, midi):
-        self.midi = midi
-    def changeOctave(self, multiplier):
-        self.midi += multiplier * 12
+    def setUpdate(self, state):
+        self.update = state
+    #def changeOctave(self, multiplier):
+    #    self.midi += multiplier * 12
 
 class RgbButton:
     def __init__(self, midi):
@@ -84,20 +81,17 @@ class RgbButton:
         self.note = RgbButtonNote(midi)
         self.row = int((midi - 1) / 8)
         self.col = (midi - 1) % 8
-        print(self.row, self.col)
-    def getState(self):
+    def getMidi(self):
+        return(self.midi)
+    def isState(self):
         return(self.state)
     def setState(self, state):
         self.state = state
-        self.setUpdate()
-    def getMidi(self):
-        return(self.midi)
+        self.setUpdate(True)
     def isUpdate(self):
         return(self.update)
-    def setUpdate(self):
-        self.update = True
-    def unsetUpdate(self):
-        self.update = False
+    def setUpdate(self, state):
+        self.update = state
     def getRow(self):
         return(self.row)
     def getCol(self):
@@ -114,10 +108,8 @@ class Pot:
         return(self.value)
     def setValue(self, value):
         self.value = value
-        self.setUpdate()
+        self.setUpdate(True)
     def isUpdate(self):
         return(self.update)
-    def setUpdate(self):
-        self.update = True
-    def unsetUpdate(self):
-        self.update = False
+    def setUpdate(self, state):
+        self.update = state
