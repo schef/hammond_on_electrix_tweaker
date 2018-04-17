@@ -113,3 +113,7 @@ class Pot:
         return(self.update)
     def setUpdate(self, state):
         self.update = state
+
+class Button:
+    def __init__(self):
+        self.state = False
