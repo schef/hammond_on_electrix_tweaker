@@ -25,12 +25,12 @@ port_tweaker = sys.argv[1] if len(sys.argv) > 1 else None
 port_hammond = sys.argv[2] if len(sys.argv) > 2 else None
 
 try:
-    print("Connecting LED output")
-    midiout_led, port_name = open_midioutput(port=port_tweaker, client_name="tweaker", port_name="output_led")
-    print("Connecting Notes output")
-    midiout_notes, port_name = open_midioutput(port=port_hammond, client_name="tweaker", port_name="output_notes")
-    print("Connecting LED input")
-    midiin, port_name = open_midiinput(port=port_tweaker, client_name="tweaker", port_name="input")
+    print("ToTweaker")
+    midiout_led, port_name = open_midioutput(port=port_tweaker, client_name="tweaker", port_name="ToTweaker")
+    print("Output")
+    midiout_notes, port_name = open_midioutput(port=port_hammond, client_name="tweaker", port_name="Output")
+    print("FromTweaker")
+    midiin, port_name = open_midiinput(port=port_tweaker, client_name="tweaker", port_name="FromTweaker")
 
 except (EOFError, KeyboardInterrupt):
     sys.exit()
@@ -263,10 +263,24 @@ class TweakerControlChangeEnum(Enum):
     TRACK_SELECT = 56
 
 
-class TweakerCommandNameEnum(Enum):
+class TweakerStatusByteEnum(Enum):
     NOTE_ON = 144
     CONTROL_CHANGE = 176
 
+class ButtonDummy:
+    def __init__(self):
+        self.midi = 0
+        self.state = False
+
+    def is_state(self):
+        return(self.state)
+
+    def set_state(self, state):
+        self.state = state
+        self.execute()
+
+    def execute(self):
+        pass
 
 class Button:
     def __init__(self, midi):
@@ -282,7 +296,7 @@ class Button:
 
     def execute(self):
         print(self.midi, self.state)
-        midiout_notes.send_message([TweakerCommandNameEnum.NOTE_ON.value, self.midi, self.state])
+        midiout_notes.send_message([TweakerStatusByteEnum.NOTE_ON.value, self.midi, self.state])
 
 
 class Slider:
@@ -299,7 +313,7 @@ class Slider:
 
     def execute(self):
         print(self.midi, self.state)
-        midiout_notes.send_message([TweakerCommandNameEnum.CONTROL_CHANGE.value, self.midi, self.state])
+        midiout_notes.send_message([TweakerStatusByteEnum.CONTROL_CHANGE.value, self.midi, self.state])
 
 
 buttonsDict = dict()
@@ -336,24 +350,49 @@ buttonsDict[TweakerNoteOnEnum.BUTTON_ROW4_COL6] = Button(NOTE_BASE_G - NOTE_STRI
 buttonsDict[TweakerNoteOnEnum.BUTTON_ROW4_COL7] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 3 + START_OCTAVE * 12 + 7)
 buttonsDict[TweakerNoteOnEnum.BUTTON_ROW4_COL8] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 3 + START_OCTAVE * 12 + 8)
 
+for key in TweakerNoteOnEnum:
+    if key not in buttonsDict:
+        buttonsDict[key] = ButtonDummy()
+
 
 sliderDict = dict()
 sliderDict[TweakerControlChangeEnum.SLIDER_LEFT] = Slider(11)
 sliderDict[TweakerControlChangeEnum.SLIDER_RIGHT] = Slider(1)
 sliderDict[TweakerControlChangeEnum.SLIDER_CENTER] = Slider(2)
 
+for i in TweakerControlChangeEnum:
+    if key not in sliderDict:
+        sliderDict[key] = ButtonDummy()
+
 
 def processBotnu(message):
-    command = TweakerCommandNameEnum(message[0])
-    note = TweakerNoteOnEnum(message[1])
-    control = TweakerControlChangeEnum(message[1])
-    state = message[2]
-    if command == TweakerCommandNameEnum.NOTE_ON:
-        if note not in buttonsDict: pass
+    status = message[0]
+    status_byte_1 = message[1]
+    status_byte_2 = message[2]
+
+    if not TweakerStatusByteEnum(status):
+        print("status byte " + str(status) + " not in TweakerCommandNameEnum")
+        return
+    else:
+        command = TweakerStatusByteEnum(status)
+
+    if not TweakerNoteOnEnum(status_byte_1):
+        print("status byte " + str(status) + " not in TweakerCommandNameEnum")
+        return
+    note = TweakerNoteOnEnum(status_byte_1)
+
+    if not TweakerControlChangeEnum(status_byte_1):
+        print("status byte " + str(status) + " not in TweakerCommandNameEnum")
+        return
+    control = TweakerControlChangeEnum(status_byte_1)
+
+    state = status_byte_2
+
+    if command == TweakerStatusByteEnum.NOTE_ON:
         buttonsDict[note].set_state(state)
-    elif command == TweakerCommandNameEnum.CONTROL_CHANGE:
-        if control not in sliderDict: pass
+    elif command == TweakerStatusByteEnum.CONTROL_CHANGE:
         sliderDict[control].set_state(state)
+
 
 class MidiInputHandler(object):
     def __init__(self, port):
