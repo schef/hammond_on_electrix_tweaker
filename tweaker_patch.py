@@ -267,6 +267,7 @@ class TweakerStatusByteEnum(Enum):
     NOTE_ON = 144
     CONTROL_CHANGE = 176
 
+
 class ButtonDummy:
     def __init__(self):
         self.midi = 0
@@ -281,6 +282,7 @@ class ButtonDummy:
 
     def execute(self):
         pass
+
 
 class Button:
     def __init__(self, midi):
@@ -317,52 +319,52 @@ class Slider:
 
 
 buttonsDict = dict()
-buttonsDict[TweakerNoteOnEnum.BUTTON_ROW1_COL1] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 0 + START_OCTAVE * 12 + 1)
-buttonsDict[TweakerNoteOnEnum.BUTTON_ROW1_COL2] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 0 + START_OCTAVE * 12 + 2)
-buttonsDict[TweakerNoteOnEnum.BUTTON_ROW1_COL3] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 0 + START_OCTAVE * 12 + 3)
-buttonsDict[TweakerNoteOnEnum.BUTTON_ROW1_COL4] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 0 + START_OCTAVE * 12 + 4)
-buttonsDict[TweakerNoteOnEnum.BUTTON_ROW1_COL5] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 0 + START_OCTAVE * 12 + 5)
-buttonsDict[TweakerNoteOnEnum.BUTTON_ROW1_COL6] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 0 + START_OCTAVE * 12 + 6)
-buttonsDict[TweakerNoteOnEnum.BUTTON_ROW1_COL7] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 0 + START_OCTAVE * 12 + 7)
-buttonsDict[TweakerNoteOnEnum.BUTTON_ROW1_COL8] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 0 + START_OCTAVE * 12 + 8)
-buttonsDict[TweakerNoteOnEnum.BUTTON_ROW2_COL1] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 1 + START_OCTAVE * 12 + 1)
-buttonsDict[TweakerNoteOnEnum.BUTTON_ROW2_COL2] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 1 + START_OCTAVE * 12 + 2)
-buttonsDict[TweakerNoteOnEnum.BUTTON_ROW2_COL3] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 1 + START_OCTAVE * 12 + 3)
-buttonsDict[TweakerNoteOnEnum.BUTTON_ROW2_COL4] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 1 + START_OCTAVE * 12 + 4)
-buttonsDict[TweakerNoteOnEnum.BUTTON_ROW2_COL5] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 1 + START_OCTAVE * 12 + 5)
-buttonsDict[TweakerNoteOnEnum.BUTTON_ROW2_COL6] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 1 + START_OCTAVE * 12 + 6)
-buttonsDict[TweakerNoteOnEnum.BUTTON_ROW2_COL7] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 1 + START_OCTAVE * 12 + 7)
-buttonsDict[TweakerNoteOnEnum.BUTTON_ROW2_COL8] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 1 + START_OCTAVE * 12 + 8)
-buttonsDict[TweakerNoteOnEnum.BUTTON_ROW3_COL1] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 2 + START_OCTAVE * 12 + 1)
-buttonsDict[TweakerNoteOnEnum.BUTTON_ROW3_COL2] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 2 + START_OCTAVE * 12 + 2)
-buttonsDict[TweakerNoteOnEnum.BUTTON_ROW3_COL3] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 2 + START_OCTAVE * 12 + 3)
-buttonsDict[TweakerNoteOnEnum.BUTTON_ROW3_COL4] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 2 + START_OCTAVE * 12 + 4)
-buttonsDict[TweakerNoteOnEnum.BUTTON_ROW3_COL5] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 2 + START_OCTAVE * 12 + 5)
-buttonsDict[TweakerNoteOnEnum.BUTTON_ROW3_COL6] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 2 + START_OCTAVE * 12 + 6)
-buttonsDict[TweakerNoteOnEnum.BUTTON_ROW3_COL7] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 2 + START_OCTAVE * 12 + 7)
-buttonsDict[TweakerNoteOnEnum.BUTTON_ROW3_COL8] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 2 + START_OCTAVE * 12 + 8)
-buttonsDict[TweakerNoteOnEnum.BUTTON_ROW4_COL1] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 3 + START_OCTAVE * 12 + 1)
-buttonsDict[TweakerNoteOnEnum.BUTTON_ROW4_COL2] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 3 + START_OCTAVE * 12 + 2)
-buttonsDict[TweakerNoteOnEnum.BUTTON_ROW4_COL3] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 3 + START_OCTAVE * 12 + 3)
-buttonsDict[TweakerNoteOnEnum.BUTTON_ROW4_COL4] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 3 + START_OCTAVE * 12 + 4)
-buttonsDict[TweakerNoteOnEnum.BUTTON_ROW4_COL5] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 3 + START_OCTAVE * 12 + 5)
-buttonsDict[TweakerNoteOnEnum.BUTTON_ROW4_COL6] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 3 + START_OCTAVE * 12 + 6)
-buttonsDict[TweakerNoteOnEnum.BUTTON_ROW4_COL7] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 3 + START_OCTAVE * 12 + 7)
-buttonsDict[TweakerNoteOnEnum.BUTTON_ROW4_COL8] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 3 + START_OCTAVE * 12 + 8)
-
-for key in TweakerNoteOnEnum:
-    if key not in buttonsDict:
-        buttonsDict[key] = ButtonDummy()
-
+buttonsDict[TweakerNoteOnEnum.BUTTON_ROW1_COL1.name] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 0 + START_OCTAVE * 12 + 1)
+buttonsDict[TweakerNoteOnEnum.BUTTON_ROW1_COL2.name] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 0 + START_OCTAVE * 12 + 2)
+buttonsDict[TweakerNoteOnEnum.BUTTON_ROW1_COL3.name] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 0 + START_OCTAVE * 12 + 3)
+buttonsDict[TweakerNoteOnEnum.BUTTON_ROW1_COL4.name] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 0 + START_OCTAVE * 12 + 4)
+buttonsDict[TweakerNoteOnEnum.BUTTON_ROW1_COL5.name] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 0 + START_OCTAVE * 12 + 5)
+buttonsDict[TweakerNoteOnEnum.BUTTON_ROW1_COL6.name] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 0 + START_OCTAVE * 12 + 6)
+buttonsDict[TweakerNoteOnEnum.BUTTON_ROW1_COL7.name] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 0 + START_OCTAVE * 12 + 7)
+buttonsDict[TweakerNoteOnEnum.BUTTON_ROW1_COL8.name] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 0 + START_OCTAVE * 12 + 8)
+buttonsDict[TweakerNoteOnEnum.BUTTON_ROW2_COL1.name] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 1 + START_OCTAVE * 12 + 1)
+buttonsDict[TweakerNoteOnEnum.BUTTON_ROW2_COL2.name] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 1 + START_OCTAVE * 12 + 2)
+buttonsDict[TweakerNoteOnEnum.BUTTON_ROW2_COL3.name] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 1 + START_OCTAVE * 12 + 3)
+buttonsDict[TweakerNoteOnEnum.BUTTON_ROW2_COL4.name] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 1 + START_OCTAVE * 12 + 4)
+buttonsDict[TweakerNoteOnEnum.BUTTON_ROW2_COL5.name] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 1 + START_OCTAVE * 12 + 5)
+buttonsDict[TweakerNoteOnEnum.BUTTON_ROW2_COL6.name] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 1 + START_OCTAVE * 12 + 6)
+buttonsDict[TweakerNoteOnEnum.BUTTON_ROW2_COL7.name] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 1 + START_OCTAVE * 12 + 7)
+buttonsDict[TweakerNoteOnEnum.BUTTON_ROW2_COL8.name] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 1 + START_OCTAVE * 12 + 8)
+buttonsDict[TweakerNoteOnEnum.BUTTON_ROW3_COL1.name] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 2 + START_OCTAVE * 12 + 1)
+buttonsDict[TweakerNoteOnEnum.BUTTON_ROW3_COL2.name] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 2 + START_OCTAVE * 12 + 2)
+buttonsDict[TweakerNoteOnEnum.BUTTON_ROW3_COL3.name] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 2 + START_OCTAVE * 12 + 3)
+buttonsDict[TweakerNoteOnEnum.BUTTON_ROW3_COL4.name] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 2 + START_OCTAVE * 12 + 4)
+buttonsDict[TweakerNoteOnEnum.BUTTON_ROW3_COL5.name] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 2 + START_OCTAVE * 12 + 5)
+buttonsDict[TweakerNoteOnEnum.BUTTON_ROW3_COL6.name] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 2 + START_OCTAVE * 12 + 6)
+buttonsDict[TweakerNoteOnEnum.BUTTON_ROW3_COL7.name] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 2 + START_OCTAVE * 12 + 7)
+buttonsDict[TweakerNoteOnEnum.BUTTON_ROW3_COL8.name] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 2 + START_OCTAVE * 12 + 8)
+buttonsDict[TweakerNoteOnEnum.BUTTON_ROW4_COL1.name] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 3 + START_OCTAVE * 12 + 1)
+buttonsDict[TweakerNoteOnEnum.BUTTON_ROW4_COL2.name] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 3 + START_OCTAVE * 12 + 2)
+buttonsDict[TweakerNoteOnEnum.BUTTON_ROW4_COL3.name] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 3 + START_OCTAVE * 12 + 3)
+buttonsDict[TweakerNoteOnEnum.BUTTON_ROW4_COL4.name] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 3 + START_OCTAVE * 12 + 4)
+buttonsDict[TweakerNoteOnEnum.BUTTON_ROW4_COL5.name] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 3 + START_OCTAVE * 12 + 5)
+buttonsDict[TweakerNoteOnEnum.BUTTON_ROW4_COL6.name] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 3 + START_OCTAVE * 12 + 6)
+buttonsDict[TweakerNoteOnEnum.BUTTON_ROW4_COL7.name] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 3 + START_OCTAVE * 12 + 7)
+buttonsDict[TweakerNoteOnEnum.BUTTON_ROW4_COL8.name] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 3 + START_OCTAVE * 12 + 8)
 
 sliderDict = dict()
-sliderDict[TweakerControlChangeEnum.SLIDER_LEFT] = Slider(11)
-sliderDict[TweakerControlChangeEnum.SLIDER_RIGHT] = Slider(1)
-sliderDict[TweakerControlChangeEnum.SLIDER_CENTER] = Slider(2)
+sliderDict[TweakerControlChangeEnum.SLIDER_LEFT.name] = Slider(11)
+sliderDict[TweakerControlChangeEnum.PAD_ROW2_COL1.name] = Slider(1)
+sliderDict[TweakerControlChangeEnum.SLIDER_CENTER.name] = Slider(1)
+sliderDict[TweakerControlChangeEnum.ENCODER_LOW_LEFT.name] = Slider(19)
 
-for i in TweakerControlChangeEnum:
-    if key not in sliderDict:
-        sliderDict[key] = ButtonDummy()
+
+def item_exists(my_object, item):
+    try:
+        my_object(item)
+    except ValueError:
+        return False
+    return True
 
 
 def processBotnu(message):
@@ -370,27 +372,31 @@ def processBotnu(message):
     status_byte_1 = message[1]
     status_byte_2 = message[2]
 
-    if not TweakerStatusByteEnum(status):
-        print("status byte " + str(status) + " not in TweakerCommandNameEnum")
-        return
+    if item_exists(TweakerStatusByteEnum, status):
+        command = TweakerStatusByteEnum(status).name
     else:
-        command = TweakerStatusByteEnum(status)
-
-    if not TweakerNoteOnEnum(status_byte_1):
-        print("status byte " + str(status) + " not in TweakerCommandNameEnum")
         return
-    note = TweakerNoteOnEnum(status_byte_1)
 
-    if not TweakerControlChangeEnum(status_byte_1):
-        print("status byte " + str(status) + " not in TweakerCommandNameEnum")
+    if command == TweakerStatusByteEnum.NOTE_ON.name:
+        if item_exists(TweakerNoteOnEnum, status_byte_1):
+            note = TweakerNoteOnEnum(status_byte_1).name
+        else:
+            return
+    elif command == TweakerStatusByteEnum.CONTROL_CHANGE.name:
+        if item_exists(TweakerControlChangeEnum, status_byte_1):
+            control = TweakerControlChangeEnum(status_byte_1).name
+        else:
+            return
+    else:
         return
-    control = TweakerControlChangeEnum(status_byte_1)
 
     state = status_byte_2
 
-    if command == TweakerStatusByteEnum.NOTE_ON:
+    if command == TweakerStatusByteEnum.NOTE_ON.name:
+        if note not in buttonsDict: return
         buttonsDict[note].set_state(state)
-    elif command == TweakerStatusByteEnum.CONTROL_CHANGE:
+    elif command == TweakerStatusByteEnum.CONTROL_CHANGE.name:
+        if control not in sliderDict: return
         sliderDict[control].set_state(state)
 
 
