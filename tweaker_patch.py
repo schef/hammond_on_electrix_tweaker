@@ -46,6 +46,24 @@ NOTE_BASE_G = 7
 NOTE_STRING_DIFF = 5
 START_OCTAVE = 5
 
+class Singleton(type):
+    _instances = {}
+    def __call__(cls, *args, **kwargs):
+        if cls not in cls._instances:
+            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
+        return cls._instances[cls]
+
+class InternalData(metaclass=Singleton):
+    velocity = 100
+
+    def __init__(self):
+        pass
+
+    def get_velocity(self):
+        return self.velocity
+
+    def set_velocity(self, velocity):
+        self.velocity = velocity
 
 # def colorNotesBackground():
 #     # passive coloring
@@ -268,54 +286,48 @@ class TweakerStatusByteEnum(Enum):
     CONTROL_CHANGE = 176
 
 
-class ButtonDummy:
-    def __init__(self):
-        self.midi = 0
-        self.state = False
+class EmptyDevice:
+    midi = 0
+    velocity = 0
 
-    def is_state(self):
-        return(self.state)
+    def get_velocity(self):
+        return self.velocity
 
-    def set_state(self, state):
-        self.state = state
+    def set_velocity(self, velocity):
+        self.velocity = velocity
         self.execute()
 
     def execute(self):
         pass
 
 
-class Button:
+class Button(EmptyDevice):
+
     def __init__(self, midi):
         self.midi = midi
-        self.state = False
-
-    def is_state(self):
-        return(self.state)
-
-    def set_state(self, state):
-        self.state = state
-        self.execute()
+        self.velocity = 0
 
     def execute(self):
-        print(self.midi, self.state)
-        midiout_notes.send_message([TweakerStatusByteEnum.NOTE_ON.value, self.midi, self.state])
+        velocity = 0
+        if self.velocity:
+            velocity = InternalData().get_velocity()
+        print(self.midi, velocity)
+        midiout_notes.send_message([TweakerStatusByteEnum.NOTE_ON.value, self.midi, velocity])
 
 
-class Slider:
+class Slider(EmptyDevice):
     def __init__(self, midi):
         self.midi = midi
-        self.state = 0
-
-    def is_state(self):
-        return(self.state)
-
-    def set_state(self, state):
-        self.state = state
-        self.execute()
+        self.velocity = 0
 
     def execute(self):
-        print(self.midi, self.state)
-        midiout_notes.send_message([TweakerStatusByteEnum.CONTROL_CHANGE.value, self.midi, self.state])
+        print(self.midi, self.velocity)
+        midiout_notes.send_message([TweakerStatusByteEnum.CONTROL_CHANGE.value, self.midi, self.velocity])
+
+
+class InternalVelocity(EmptyDevice):
+    def execute(self):
+        InternalData().set_velocity(self.velocity)
 
 
 buttonsDict = dict()
@@ -356,7 +368,7 @@ sliderDict = dict()
 sliderDict[TweakerControlChangeEnum.SLIDER_LEFT.name] = Slider(11)
 sliderDict[TweakerControlChangeEnum.PAD_ROW2_COL1.name] = Slider(1)
 sliderDict[TweakerControlChangeEnum.SLIDER_CENTER.name] = Slider(1)
-sliderDict[TweakerControlChangeEnum.ENCODER_LOW_LEFT.name] = Slider(19)
+sliderDict[TweakerControlChangeEnum.ENCODER_LOW_LEFT.name] = InternalVelocity()
 
 
 def item_exists(my_object, item):
@@ -394,10 +406,10 @@ def processBotnu(message):
 
     if command == TweakerStatusByteEnum.NOTE_ON.name:
         if note not in buttonsDict: return
-        buttonsDict[note].set_state(state)
+        buttonsDict[note].set_velocity(state)
     elif command == TweakerStatusByteEnum.CONTROL_CHANGE.name:
         if control not in sliderDict: return
-        sliderDict[control].set_state(state)
+        sliderDict[control].set_velocity(state)
 
 
 class MidiInputHandler(object):
