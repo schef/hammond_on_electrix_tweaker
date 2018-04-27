@@ -46,25 +46,6 @@ NOTE_BASE_G = 7
 NOTE_STRING_DIFF = 5
 START_OCTAVE = 5
 
-class Singleton(type):
-    _instances = {}
-    def __call__(cls, *args, **kwargs):
-        if cls not in cls._instances:
-            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
-        return cls._instances[cls]
-
-class InternalData(metaclass=Singleton):
-    velocity = 100
-
-    def __init__(self):
-        pass
-
-    def get_velocity(self):
-        return self.velocity
-
-    def set_velocity(self, velocity):
-        self.velocity = velocity
-
 # def colorNotesBackground():
 #     # passive coloring
 #     for key in rgbButtons:
@@ -89,108 +70,61 @@ class InternalData(metaclass=Singleton):
 #         if (button.getRow() in range(0, 4)):
 #             if (button.isState()):
 #                 button.color.setColorBlue()
-#
-#
-# def setMidiNotes():
-#     for key in rgbButtons:
-#         button = rgbButtons[key]
-#         # set notes based on bass
-#         if (button.getRow() in range(0, 4)):
-#             formula = (NOTE_BASE_G + TONE_MOD) + (OCTAVE * 12) - (
-#                         NOTE_STRING_DIFF * (button.getRow() + STR_MOD)) + button.getCol()
-#             button.note.setMidi(formula)
-#
-#
-# for midi in SOFT_TOUCH_BUTTONS:
-#     rgbButtons[midi] = RgbButton(midi)
-#
-# for midi in POTENTIOMETERS:
-#     pots[midi] = Pot(midi)
-#
-# for key in rgbButtons:
-#     button = rgbButtons[key]
-#     button.color.setColorOff()
-#     setMidiNotes()
-#
-#
-# def setUpdateButton(state):
-#     global updateButtonState
-#     updateButtonState = state
-#
-#
-# def isUpdateButton():
-#     global updateButtonState
-#     return (updateButtonState)
-#
-#
-# def updateButton(key):
-#     button = rgbButtons[key]
-#     # handle buttonPress
-#     if (button.isUpdate()):
-#         if (button.isState()):
-#             button.color.setColorBlue()
-#             button.note.setState(True)
-#         else:
-#             button.color.setColorOff()
-#             colorNotesBackground()
-#             button.note.setState(False)
-#         button.setUpdate(False)
-#     # handle buttonNote
-#     if (button.note.isUpdate()):
-#         if (button.note.isState()):
-#             midiout_notes.send_message([NOTE_ON, button.note.getMidi(), 127])
-#         else:
-#             midiout_notes.send_message([NOTE_ON, button.note.getMidi(), 0])
-#         button.note.setUpdate(False)
-#     # handle buttonColor
-#     if (button.color.isUpdate()):
-#         midiout_led.send_message([NOTE_ON, button.getMidi(), button.color.getColor()])
-#         button.color.setUpdate(False)
-#
-#
-# def updatePot():
-#     global STR_MOD
-#     global TONE_MOD
-#     for key in pots:
-#         pot = pots[key]
-#         if (pot.isUpdate()):
-#             if (pot.getMidi() == POTENTIOMETERS[1]):
-#                 str_mod = int(pot.getValue() / 16) - 4
-#                 STR_MOD = str_mod
-#                 setMidiNotes()
-#                 colorNotesBackground()
-#                 for key in rgbButtons:
-#                     updateButton(key)
-#             elif (pot.getMidi() == POTENTIOMETERS[2]):
-#                 #tone_mod = (int(pot.getValue() / 16) - 4) * -1
-#                 #TONE_MOD = tone_mod
-#                 #setMidiNotes()
-#                 #colorNotesBackground()
-#                 #for key in rgbButtons:
-#                 #
-#                 #updateButton(key)
-#                 #print(pot.getValue())
-#                 #midiout_notes.send_message([176, pot.getMidi(), pot.getValue()])
-#                 midiout_notes.send_message([176, 11, pot.getValue()])
-#             else:
-#                 # print(pot.getValue())
-#                 # midiout_notes.send_message([176, pot.getMidi(), pot.getValue()])
-#                 midiout_notes.send_message([176, 1, pot.getValue()])
-#             pot.setUpdate(False)
-#
-#
-# def processMidi(message):
-#     if message[1] in SOFT_TOUCH_BUTTONS:
-#         button = rgbButtons[message[1]]
-#         if (message[2] == 127):
-#             button.setState(True)
-#             rgbButtonsQueue.insert(0, message[1])
-#         elif (message[2] == 0):
-#             button.setState(False)
-#             rgbButtonsQueue.insert(0, message[1])
-#     elif message[1] in POTENTIOMETERS and message[0] == 176:
-#         pot = pots[message[1]]
-#         pot.setValue(message[2])
+
+
+class Singleton(type):
+    _instances = {}
+    def __call__(cls, *args, **kwargs):
+        if cls not in cls._instances:
+            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
+        return cls._instances[cls]
+
+
+class InternalData(metaclass=Singleton):
+    velocity = 100
+    octave = 0
+    octaveResolution = 15
+    octaveMaxValue = 127
+    colors = {
+    "OFF"     : 0,
+    "GREEN"   : 1,
+    "RED"     : 4,
+    "YELLOW"  : 8,
+    "BLUE"    : 16,
+    "CYAN"    : 32,
+    "MAGENTA" : 64,
+    "WHITE"   : 127
+    }
+
+    def __init__(self):
+        pass
+
+    def get_velocity(self):
+        return self.velocity
+
+    def set_velocity(self, velocity):
+        self.velocity = velocity
+        print("set_velocity: ", self.velocity)
+
+    def get_octave(self):
+        return self.octave
+
+    def set_octave(self, value):
+        self.octave = int((value / self.octaveMaxValue) * self.octaveResolution) - int(self.octaveResolution/2)
+        print("set_octave: ", self.octave)
+        for button in buttonsDict:
+            if buttonsDict[button].get_play_midi() == 60:
+                midiout_led.send_message([TweakerStatusByteEnum.NOTE_ON.value, buttonsDict[button].get_manuf_midi(), self.colors["RED"]])
+            elif buttonsDict[button].get_play_midi() == 60 + 12:
+                midiout_led.send_message([TweakerStatusByteEnum.NOTE_ON.value, buttonsDict[button].get_manuf_midi(), self.colors["MAGENTA"]])
+            elif buttonsDict[button].get_play_midi() == 60 + 12 + 12:
+                midiout_led.send_message([TweakerStatusByteEnum.NOTE_ON.value, buttonsDict[button].get_manuf_midi(), self.colors["YELLOW"]])
+            elif buttonsDict[button].get_play_midi() == 60 - 12:
+                midiout_led.send_message([TweakerStatusByteEnum.NOTE_ON.value, buttonsDict[button].get_manuf_midi(), self.colors["GREEN"]])
+            elif buttonsDict[button].get_play_midi() == 60 - 12 - 12:
+                midiout_led.send_message([TweakerStatusByteEnum.NOTE_ON.value, buttonsDict[button].get_manuf_midi(), self.colors["BLUE"]])
+            else:
+                midiout_led.send_message([TweakerStatusByteEnum.NOTE_ON.value, buttonsDict[button].get_manuf_midi(), self.colors["OFF"]])
 
 
 class TweakerNoteOnEnum(Enum):
@@ -287,15 +221,25 @@ class TweakerStatusByteEnum(Enum):
 
 
 class EmptyDevice:
-    midi = 0
+    init_midi = 0
     velocity = 0
+    manuf_midi = 0
 
     def get_velocity(self):
-        return self.velocity
+        if self.velocity:
+            return InternalData().get_velocity()
+        else:
+            return self.velocity
 
     def set_velocity(self, velocity):
         self.velocity = velocity
         self.execute()
+
+    def get_play_midi(self):
+        return self.init_midi + InternalData().get_octave() * 5
+
+    def get_manuf_midi(self):
+        return self.manuf_midi
 
     def execute(self):
         pass
@@ -303,72 +247,75 @@ class EmptyDevice:
 
 class Button(EmptyDevice):
 
-    def __init__(self, midi):
-        self.midi = midi
-        self.velocity = 0
+    def __init__(self, manuf_midi, init_midi):
+        self.manuf_midi = manuf_midi
+        self.init_midi = init_midi
 
     def execute(self):
-        velocity = 0
-        if self.velocity:
-            velocity = InternalData().get_velocity()
-        print(self.midi, velocity)
-        midiout_notes.send_message([TweakerStatusByteEnum.NOTE_ON.value, self.midi, velocity])
+        print(self.get_play_midi(), self.get_velocity())
+        midiout_notes.send_message([TweakerStatusByteEnum.NOTE_ON.value, self.get_play_midi(), self.get_velocity()])
 
 
 class Slider(EmptyDevice):
-    def __init__(self, midi):
-        self.midi = midi
-        self.velocity = 0
+    def __init__(self, init_midi):
+        self.init_midi = init_midi
 
     def execute(self):
-        print(self.midi, self.velocity)
-        midiout_notes.send_message([TweakerStatusByteEnum.CONTROL_CHANGE.value, self.midi, self.velocity])
+        print(self.init_midi, self.velocity)
+        midiout_notes.send_message([TweakerStatusByteEnum.CONTROL_CHANGE.value, self.init_midi, self.velocity])
 
 
 class InternalVelocity(EmptyDevice):
     def execute(self):
         InternalData().set_velocity(self.velocity)
 
+class InternalOctave(EmptyDevice):
+    def execute(self):
+        InternalData().set_octave(self.velocity)
+
+
+##### REGITER DEVICES #####
 
 buttonsDict = dict()
-buttonsDict[TweakerNoteOnEnum.BUTTON_ROW1_COL1.name] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 0 + START_OCTAVE * 12 + 1)
-buttonsDict[TweakerNoteOnEnum.BUTTON_ROW1_COL2.name] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 0 + START_OCTAVE * 12 + 2)
-buttonsDict[TweakerNoteOnEnum.BUTTON_ROW1_COL3.name] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 0 + START_OCTAVE * 12 + 3)
-buttonsDict[TweakerNoteOnEnum.BUTTON_ROW1_COL4.name] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 0 + START_OCTAVE * 12 + 4)
-buttonsDict[TweakerNoteOnEnum.BUTTON_ROW1_COL5.name] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 0 + START_OCTAVE * 12 + 5)
-buttonsDict[TweakerNoteOnEnum.BUTTON_ROW1_COL6.name] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 0 + START_OCTAVE * 12 + 6)
-buttonsDict[TweakerNoteOnEnum.BUTTON_ROW1_COL7.name] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 0 + START_OCTAVE * 12 + 7)
-buttonsDict[TweakerNoteOnEnum.BUTTON_ROW1_COL8.name] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 0 + START_OCTAVE * 12 + 8)
-buttonsDict[TweakerNoteOnEnum.BUTTON_ROW2_COL1.name] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 1 + START_OCTAVE * 12 + 1)
-buttonsDict[TweakerNoteOnEnum.BUTTON_ROW2_COL2.name] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 1 + START_OCTAVE * 12 + 2)
-buttonsDict[TweakerNoteOnEnum.BUTTON_ROW2_COL3.name] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 1 + START_OCTAVE * 12 + 3)
-buttonsDict[TweakerNoteOnEnum.BUTTON_ROW2_COL4.name] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 1 + START_OCTAVE * 12 + 4)
-buttonsDict[TweakerNoteOnEnum.BUTTON_ROW2_COL5.name] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 1 + START_OCTAVE * 12 + 5)
-buttonsDict[TweakerNoteOnEnum.BUTTON_ROW2_COL6.name] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 1 + START_OCTAVE * 12 + 6)
-buttonsDict[TweakerNoteOnEnum.BUTTON_ROW2_COL7.name] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 1 + START_OCTAVE * 12 + 7)
-buttonsDict[TweakerNoteOnEnum.BUTTON_ROW2_COL8.name] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 1 + START_OCTAVE * 12 + 8)
-buttonsDict[TweakerNoteOnEnum.BUTTON_ROW3_COL1.name] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 2 + START_OCTAVE * 12 + 1)
-buttonsDict[TweakerNoteOnEnum.BUTTON_ROW3_COL2.name] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 2 + START_OCTAVE * 12 + 2)
-buttonsDict[TweakerNoteOnEnum.BUTTON_ROW3_COL3.name] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 2 + START_OCTAVE * 12 + 3)
-buttonsDict[TweakerNoteOnEnum.BUTTON_ROW3_COL4.name] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 2 + START_OCTAVE * 12 + 4)
-buttonsDict[TweakerNoteOnEnum.BUTTON_ROW3_COL5.name] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 2 + START_OCTAVE * 12 + 5)
-buttonsDict[TweakerNoteOnEnum.BUTTON_ROW3_COL6.name] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 2 + START_OCTAVE * 12 + 6)
-buttonsDict[TweakerNoteOnEnum.BUTTON_ROW3_COL7.name] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 2 + START_OCTAVE * 12 + 7)
-buttonsDict[TweakerNoteOnEnum.BUTTON_ROW3_COL8.name] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 2 + START_OCTAVE * 12 + 8)
-buttonsDict[TweakerNoteOnEnum.BUTTON_ROW4_COL1.name] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 3 + START_OCTAVE * 12 + 1)
-buttonsDict[TweakerNoteOnEnum.BUTTON_ROW4_COL2.name] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 3 + START_OCTAVE * 12 + 2)
-buttonsDict[TweakerNoteOnEnum.BUTTON_ROW4_COL3.name] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 3 + START_OCTAVE * 12 + 3)
-buttonsDict[TweakerNoteOnEnum.BUTTON_ROW4_COL4.name] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 3 + START_OCTAVE * 12 + 4)
-buttonsDict[TweakerNoteOnEnum.BUTTON_ROW4_COL5.name] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 3 + START_OCTAVE * 12 + 5)
-buttonsDict[TweakerNoteOnEnum.BUTTON_ROW4_COL6.name] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 3 + START_OCTAVE * 12 + 6)
-buttonsDict[TweakerNoteOnEnum.BUTTON_ROW4_COL7.name] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 3 + START_OCTAVE * 12 + 7)
-buttonsDict[TweakerNoteOnEnum.BUTTON_ROW4_COL8.name] = Button(NOTE_BASE_G - NOTE_STRING_DIFF * 3 + START_OCTAVE * 12 + 8)
+buttonsDict[TweakerNoteOnEnum.BUTTON_ROW1_COL1.name] = Button(TweakerNoteOnEnum.BUTTON_ROW1_COL1.value, NOTE_BASE_G - NOTE_STRING_DIFF * 0 + START_OCTAVE * 12 + 1)
+buttonsDict[TweakerNoteOnEnum.BUTTON_ROW1_COL2.name] = Button(TweakerNoteOnEnum.BUTTON_ROW1_COL2.value, NOTE_BASE_G - NOTE_STRING_DIFF * 0 + START_OCTAVE * 12 + 2)
+buttonsDict[TweakerNoteOnEnum.BUTTON_ROW1_COL3.name] = Button(TweakerNoteOnEnum.BUTTON_ROW1_COL3.value, NOTE_BASE_G - NOTE_STRING_DIFF * 0 + START_OCTAVE * 12 + 3)
+buttonsDict[TweakerNoteOnEnum.BUTTON_ROW1_COL4.name] = Button(TweakerNoteOnEnum.BUTTON_ROW1_COL4.value, NOTE_BASE_G - NOTE_STRING_DIFF * 0 + START_OCTAVE * 12 + 4)
+buttonsDict[TweakerNoteOnEnum.BUTTON_ROW1_COL5.name] = Button(TweakerNoteOnEnum.BUTTON_ROW1_COL5.value, NOTE_BASE_G - NOTE_STRING_DIFF * 0 + START_OCTAVE * 12 + 5)
+buttonsDict[TweakerNoteOnEnum.BUTTON_ROW1_COL6.name] = Button(TweakerNoteOnEnum.BUTTON_ROW1_COL6.value, NOTE_BASE_G - NOTE_STRING_DIFF * 0 + START_OCTAVE * 12 + 6)
+buttonsDict[TweakerNoteOnEnum.BUTTON_ROW1_COL7.name] = Button(TweakerNoteOnEnum.BUTTON_ROW1_COL7.value, NOTE_BASE_G - NOTE_STRING_DIFF * 0 + START_OCTAVE * 12 + 7)
+buttonsDict[TweakerNoteOnEnum.BUTTON_ROW1_COL8.name] = Button(TweakerNoteOnEnum.BUTTON_ROW1_COL8.value, NOTE_BASE_G - NOTE_STRING_DIFF * 0 + START_OCTAVE * 12 + 8)
+buttonsDict[TweakerNoteOnEnum.BUTTON_ROW2_COL1.name] = Button(TweakerNoteOnEnum.BUTTON_ROW2_COL1.value, NOTE_BASE_G - NOTE_STRING_DIFF * 1 + START_OCTAVE * 12 + 1)
+buttonsDict[TweakerNoteOnEnum.BUTTON_ROW2_COL2.name] = Button(TweakerNoteOnEnum.BUTTON_ROW2_COL2.value, NOTE_BASE_G - NOTE_STRING_DIFF * 1 + START_OCTAVE * 12 + 2)
+buttonsDict[TweakerNoteOnEnum.BUTTON_ROW2_COL3.name] = Button(TweakerNoteOnEnum.BUTTON_ROW2_COL3.value, NOTE_BASE_G - NOTE_STRING_DIFF * 1 + START_OCTAVE * 12 + 3)
+buttonsDict[TweakerNoteOnEnum.BUTTON_ROW2_COL4.name] = Button(TweakerNoteOnEnum.BUTTON_ROW2_COL4.value, NOTE_BASE_G - NOTE_STRING_DIFF * 1 + START_OCTAVE * 12 + 4)
+buttonsDict[TweakerNoteOnEnum.BUTTON_ROW2_COL5.name] = Button(TweakerNoteOnEnum.BUTTON_ROW2_COL5.value, NOTE_BASE_G - NOTE_STRING_DIFF * 1 + START_OCTAVE * 12 + 5)
+buttonsDict[TweakerNoteOnEnum.BUTTON_ROW2_COL6.name] = Button(TweakerNoteOnEnum.BUTTON_ROW2_COL6.value, NOTE_BASE_G - NOTE_STRING_DIFF * 1 + START_OCTAVE * 12 + 6)
+buttonsDict[TweakerNoteOnEnum.BUTTON_ROW2_COL7.name] = Button(TweakerNoteOnEnum.BUTTON_ROW2_COL7.value, NOTE_BASE_G - NOTE_STRING_DIFF * 1 + START_OCTAVE * 12 + 7)
+buttonsDict[TweakerNoteOnEnum.BUTTON_ROW2_COL8.name] = Button(TweakerNoteOnEnum.BUTTON_ROW2_COL8.value, NOTE_BASE_G - NOTE_STRING_DIFF * 1 + START_OCTAVE * 12 + 8)
+buttonsDict[TweakerNoteOnEnum.BUTTON_ROW3_COL1.name] = Button(TweakerNoteOnEnum.BUTTON_ROW3_COL1.value, NOTE_BASE_G - NOTE_STRING_DIFF * 2 + START_OCTAVE * 12 + 1)
+buttonsDict[TweakerNoteOnEnum.BUTTON_ROW3_COL2.name] = Button(TweakerNoteOnEnum.BUTTON_ROW3_COL2.value, NOTE_BASE_G - NOTE_STRING_DIFF * 2 + START_OCTAVE * 12 + 2)
+buttonsDict[TweakerNoteOnEnum.BUTTON_ROW3_COL3.name] = Button(TweakerNoteOnEnum.BUTTON_ROW3_COL3.value, NOTE_BASE_G - NOTE_STRING_DIFF * 2 + START_OCTAVE * 12 + 3)
+buttonsDict[TweakerNoteOnEnum.BUTTON_ROW3_COL4.name] = Button(TweakerNoteOnEnum.BUTTON_ROW3_COL4.value, NOTE_BASE_G - NOTE_STRING_DIFF * 2 + START_OCTAVE * 12 + 4)
+buttonsDict[TweakerNoteOnEnum.BUTTON_ROW3_COL5.name] = Button(TweakerNoteOnEnum.BUTTON_ROW3_COL5.value, NOTE_BASE_G - NOTE_STRING_DIFF * 2 + START_OCTAVE * 12 + 5)
+buttonsDict[TweakerNoteOnEnum.BUTTON_ROW3_COL6.name] = Button(TweakerNoteOnEnum.BUTTON_ROW3_COL6.value, NOTE_BASE_G - NOTE_STRING_DIFF * 2 + START_OCTAVE * 12 + 6)
+buttonsDict[TweakerNoteOnEnum.BUTTON_ROW3_COL7.name] = Button(TweakerNoteOnEnum.BUTTON_ROW3_COL7.value, NOTE_BASE_G - NOTE_STRING_DIFF * 2 + START_OCTAVE * 12 + 7)
+buttonsDict[TweakerNoteOnEnum.BUTTON_ROW3_COL8.name] = Button(TweakerNoteOnEnum.BUTTON_ROW3_COL8.value, NOTE_BASE_G - NOTE_STRING_DIFF * 2 + START_OCTAVE * 12 + 8)
+buttonsDict[TweakerNoteOnEnum.BUTTON_ROW4_COL1.name] = Button(TweakerNoteOnEnum.BUTTON_ROW4_COL1.value, NOTE_BASE_G - NOTE_STRING_DIFF * 3 + START_OCTAVE * 12 + 1)
+buttonsDict[TweakerNoteOnEnum.BUTTON_ROW4_COL2.name] = Button(TweakerNoteOnEnum.BUTTON_ROW4_COL2.value, NOTE_BASE_G - NOTE_STRING_DIFF * 3 + START_OCTAVE * 12 + 2)
+buttonsDict[TweakerNoteOnEnum.BUTTON_ROW4_COL3.name] = Button(TweakerNoteOnEnum.BUTTON_ROW4_COL3.value, NOTE_BASE_G - NOTE_STRING_DIFF * 3 + START_OCTAVE * 12 + 3)
+buttonsDict[TweakerNoteOnEnum.BUTTON_ROW4_COL4.name] = Button(TweakerNoteOnEnum.BUTTON_ROW4_COL4.value, NOTE_BASE_G - NOTE_STRING_DIFF * 3 + START_OCTAVE * 12 + 4)
+buttonsDict[TweakerNoteOnEnum.BUTTON_ROW4_COL5.name] = Button(TweakerNoteOnEnum.BUTTON_ROW4_COL5.value, NOTE_BASE_G - NOTE_STRING_DIFF * 3 + START_OCTAVE * 12 + 5)
+buttonsDict[TweakerNoteOnEnum.BUTTON_ROW4_COL6.name] = Button(TweakerNoteOnEnum.BUTTON_ROW4_COL6.value, NOTE_BASE_G - NOTE_STRING_DIFF * 3 + START_OCTAVE * 12 + 6)
+buttonsDict[TweakerNoteOnEnum.BUTTON_ROW4_COL7.name] = Button(TweakerNoteOnEnum.BUTTON_ROW4_COL7.value, NOTE_BASE_G - NOTE_STRING_DIFF * 3 + START_OCTAVE * 12 + 7)
+buttonsDict[TweakerNoteOnEnum.BUTTON_ROW4_COL8.name] = Button(TweakerNoteOnEnum.BUTTON_ROW4_COL8.value, NOTE_BASE_G - NOTE_STRING_DIFF * 3 + START_OCTAVE * 12 + 8)
 
 sliderDict = dict()
 sliderDict[TweakerControlChangeEnum.SLIDER_LEFT.name] = Slider(11)
 sliderDict[TweakerControlChangeEnum.PAD_ROW2_COL1.name] = Slider(1)
 sliderDict[TweakerControlChangeEnum.SLIDER_CENTER.name] = Slider(1)
 sliderDict[TweakerControlChangeEnum.ENCODER_LOW_LEFT.name] = InternalVelocity()
+sliderDict[TweakerControlChangeEnum.ENCODER_LOW_RIGHT.name] = InternalOctave()
 
 
 def item_exists(my_object, item):
@@ -422,7 +369,6 @@ class MidiInputHandler(object):
         self._wallclock += deltatime
         print("[%s] @%0.6f %r" % (self.port, self._wallclock, message))
         processBotnu(message)
-        # processMidi(message)
 
 
 print("Attaching MIDI input callback handler.")
