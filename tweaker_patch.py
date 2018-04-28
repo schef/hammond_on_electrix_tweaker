@@ -82,9 +82,8 @@ class Singleton(type):
 
 class InternalData(metaclass=Singleton):
     velocity = 100
-    octave = 0
-    octaveResolution = 15
-    octaveMaxValue = 127
+    midiOffsetHorizontal = 0
+    midiOffsetVertical = 0
     colors = {
     "OFF"     : 0,
     "GREEN"   : 1,
@@ -106,12 +105,26 @@ class InternalData(metaclass=Singleton):
         self.velocity = velocity
         print("set_velocity: ", self.velocity)
 
-    def get_octave(self):
-        return self.octave
+    def get_midi_offset(self):
+        return self.midiOffsetVertical + self.midiOffsetHorizontal
 
-    def set_octave(self, value):
-        self.octave = int((value / self.octaveMaxValue) * self.octaveResolution) - int(self.octaveResolution/2)
-        print("set_octave: ", self.octave)
+    def set_midi_offset_vertical(self, value):
+        self.midiOffsetVertical += value
+        print("midiOffset: ", self.get_midi_offset())
+        self.set_colors()
+
+    def set_midi_offset_horizontal(self, value):
+        self.midiOffsetHorizontal += value
+        print("midiOffset: ", self.get_midi_offset())
+        self.set_colors()
+
+    def reset_midi_offset(self):
+        self.midiOffsetVertical = 0
+        self.midiOffsetHorizontal = 0
+        print("midiOffset: ", self.get_midi_offset())
+        self.set_colors()
+
+    def set_colors_for_music_tones(self):
         for button in buttonsDict:
             if buttonsDict[button].get_play_midi() == 60:
                 midiout_led.send_message([TweakerStatusByteEnum.NOTE_ON.value, buttonsDict[button].get_manuf_midi(), self.colors["RED"]])
@@ -123,8 +136,37 @@ class InternalData(metaclass=Singleton):
                 midiout_led.send_message([TweakerStatusByteEnum.NOTE_ON.value, buttonsDict[button].get_manuf_midi(), self.colors["GREEN"]])
             elif buttonsDict[button].get_play_midi() == 60 - 12 - 12:
                 midiout_led.send_message([TweakerStatusByteEnum.NOTE_ON.value, buttonsDict[button].get_manuf_midi(), self.colors["BLUE"]])
+            elif buttonsDict[button].get_play_midi() > 127 or buttonsDict[button].get_play_midi() < 0:
+                midiout_led.send_message([TweakerStatusByteEnum.NOTE_ON.value, buttonsDict[button].get_manuf_midi(), self.colors["CYAN"]])
             else:
                 midiout_led.send_message([TweakerStatusByteEnum.NOTE_ON.value, buttonsDict[button].get_manuf_midi(), self.colors["OFF"]])
+
+    def set_colors_for_midi_offset(self):
+        if self.get_midi_offset():
+            midiout_led.send_message([TweakerStatusByteEnum.NOTE_ON.value, TweakerNoteOnEnum.BUTTON_GRID_NAVIGATION_CENTER.value, self.colors["OFF"]])
+        else:
+            midiout_led.send_message([TweakerStatusByteEnum.NOTE_ON.value, TweakerNoteOnEnum.BUTTON_GRID_NAVIGATION_CENTER.value, self.colors["WHITE"]])
+            midiout_led.send_message([TweakerStatusByteEnum.NOTE_ON.value, TweakerNoteOnEnum.BUTTON_GRID_NAVIGATION_UP.value, self.colors["OFF"]])
+            midiout_led.send_message([TweakerStatusByteEnum.NOTE_ON.value, TweakerNoteOnEnum.BUTTON_GRID_NAVIGATION_DOWN.value, self.colors["OFF"]])
+            midiout_led.send_message([TweakerStatusByteEnum.NOTE_ON.value, TweakerNoteOnEnum.BUTTON_GRID_NAVIGATION_LEFT.value, self.colors["OFF"]])
+            midiout_led.send_message([TweakerStatusByteEnum.NOTE_ON.value, TweakerNoteOnEnum.BUTTON_GRID_NAVIGATION_RIGHT.value, self.colors["OFF"]])
+        if self.midiOffsetVertical > 0:
+            midiout_led.send_message([TweakerStatusByteEnum.NOTE_ON.value, TweakerNoteOnEnum.BUTTON_GRID_NAVIGATION_UP.value, self.colors["OFF"]])
+            midiout_led.send_message([TweakerStatusByteEnum.NOTE_ON.value, TweakerNoteOnEnum.BUTTON_GRID_NAVIGATION_DOWN.value, self.colors["WHITE"]])
+        elif self.midiOffsetVertical < 0:
+            midiout_led.send_message([TweakerStatusByteEnum.NOTE_ON.value, TweakerNoteOnEnum.BUTTON_GRID_NAVIGATION_UP.value, self.colors["WHITE"]])
+            midiout_led.send_message([TweakerStatusByteEnum.NOTE_ON.value, TweakerNoteOnEnum.BUTTON_GRID_NAVIGATION_DOWN.value, self.colors["OFF"]])
+        if self.midiOffsetHorizontal > 0:
+            midiout_led.send_message([TweakerStatusByteEnum.NOTE_ON.value, TweakerNoteOnEnum.BUTTON_GRID_NAVIGATION_LEFT.value, self.colors["WHITE"]])
+            midiout_led.send_message([TweakerStatusByteEnum.NOTE_ON.value, TweakerNoteOnEnum.BUTTON_GRID_NAVIGATION_RIGHT.value, self.colors["OFF"]])
+        elif self.midiOffsetHorizontal < 0:
+            midiout_led.send_message([TweakerStatusByteEnum.NOTE_ON.value, TweakerNoteOnEnum.BUTTON_GRID_NAVIGATION_LEFT.value, self.colors["OFF"]])
+            midiout_led.send_message([TweakerStatusByteEnum.NOTE_ON.value, TweakerNoteOnEnum.BUTTON_GRID_NAVIGATION_RIGHT.value, self.colors["WHITE"]])
+
+    def set_colors(self):
+        self.set_colors_for_music_tones()
+        self.set_colors_for_midi_offset()
+
 
 
 class TweakerNoteOnEnum(Enum):
@@ -236,7 +278,7 @@ class EmptyDevice:
         self.execute()
 
     def get_play_midi(self):
-        return self.init_midi + InternalData().get_octave() * 5
+        return self.init_midi + InternalData().get_midi_offset()
 
     def get_manuf_midi(self):
         return self.manuf_midi
@@ -269,9 +311,24 @@ class InternalVelocity(EmptyDevice):
     def execute(self):
         InternalData().set_velocity(self.velocity)
 
-class InternalOctave(EmptyDevice):
+
+class InternalMidiOffset(EmptyDevice):
+
+    def __init__(self, manuf_midi):
+        self.manuf_midi = manuf_midi
+
     def execute(self):
-        InternalData().set_octave(self.velocity)
+        if self.velocity:
+            if self.manuf_midi == TweakerNoteOnEnum.BUTTON_GRID_NAVIGATION_UP.value:
+                InternalData().set_midi_offset_vertical(-5)
+            elif self.manuf_midi == TweakerNoteOnEnum.BUTTON_GRID_NAVIGATION_DOWN.value:
+                InternalData().set_midi_offset_vertical(+5)
+            elif self.manuf_midi == TweakerNoteOnEnum.BUTTON_GRID_NAVIGATION_LEFT.value:
+                InternalData().set_midi_offset_horizontal(+1)
+            elif self.manuf_midi == TweakerNoteOnEnum.BUTTON_GRID_NAVIGATION_RIGHT.value:
+                InternalData().set_midi_offset_horizontal(-1)
+            elif self.manuf_midi == TweakerNoteOnEnum.BUTTON_GRID_NAVIGATION_CENTER.value:
+                InternalData().reset_midi_offset()
 
 
 ##### REGITER DEVICES #####
@@ -310,12 +367,19 @@ buttonsDict[TweakerNoteOnEnum.BUTTON_ROW4_COL6.name] = Button(TweakerNoteOnEnum.
 buttonsDict[TweakerNoteOnEnum.BUTTON_ROW4_COL7.name] = Button(TweakerNoteOnEnum.BUTTON_ROW4_COL7.value, NOTE_BASE_G - NOTE_STRING_DIFF * 3 + START_OCTAVE * 12 + 7)
 buttonsDict[TweakerNoteOnEnum.BUTTON_ROW4_COL8.name] = Button(TweakerNoteOnEnum.BUTTON_ROW4_COL8.value, NOTE_BASE_G - NOTE_STRING_DIFF * 3 + START_OCTAVE * 12 + 8)
 
+midiOffsetDict = dict()
+midiOffsetDict[TweakerNoteOnEnum.BUTTON_GRID_NAVIGATION_UP.name] = InternalMidiOffset(TweakerNoteOnEnum.BUTTON_GRID_NAVIGATION_UP.value)
+midiOffsetDict[TweakerNoteOnEnum.BUTTON_GRID_NAVIGATION_DOWN.name] = InternalMidiOffset(TweakerNoteOnEnum.BUTTON_GRID_NAVIGATION_DOWN.value)
+midiOffsetDict[TweakerNoteOnEnum.BUTTON_GRID_NAVIGATION_LEFT.name] = InternalMidiOffset(TweakerNoteOnEnum.BUTTON_GRID_NAVIGATION_LEFT.value)
+midiOffsetDict[TweakerNoteOnEnum.BUTTON_GRID_NAVIGATION_RIGHT.name] = InternalMidiOffset(TweakerNoteOnEnum.BUTTON_GRID_NAVIGATION_RIGHT.value)
+midiOffsetDict[TweakerNoteOnEnum.BUTTON_GRID_NAVIGATION_CENTER.name] = InternalMidiOffset(TweakerNoteOnEnum.BUTTON_GRID_NAVIGATION_CENTER.value)
+
 sliderDict = dict()
 sliderDict[TweakerControlChangeEnum.SLIDER_LEFT.name] = Slider(11)
 sliderDict[TweakerControlChangeEnum.PAD_ROW2_COL1.name] = Slider(1)
 sliderDict[TweakerControlChangeEnum.SLIDER_CENTER.name] = Slider(1)
 sliderDict[TweakerControlChangeEnum.ENCODER_LOW_LEFT.name] = InternalVelocity()
-sliderDict[TweakerControlChangeEnum.ENCODER_LOW_RIGHT.name] = InternalOctave()
+
 
 
 def item_exists(my_object, item):
@@ -352,8 +416,10 @@ def processBotnu(message):
     state = status_byte_2
 
     if command == TweakerStatusByteEnum.NOTE_ON.name:
-        if note not in buttonsDict: return
-        buttonsDict[note].set_velocity(state)
+        if note in buttonsDict:
+            buttonsDict[note].set_velocity(state)
+        elif note in midiOffsetDict:
+            midiOffsetDict[note].set_velocity(state)
     elif command == TweakerStatusByteEnum.CONTROL_CHANGE.name:
         if control not in sliderDict: return
         sliderDict[control].set_velocity(state)
@@ -376,6 +442,7 @@ midiin.set_callback(MidiInputHandler(port_name))
 
 print("Entering main loop. Press Control-C to exit.")
 try:
+    InternalData().set_colors()
     while True:
         pass
 except KeyboardInterrupt:
