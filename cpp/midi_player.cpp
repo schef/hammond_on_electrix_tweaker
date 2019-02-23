@@ -109,15 +109,24 @@ void MidiPlayer::staticCallbackFunction(double deltatime,
   getInstance()->callbackFunction(deltatime, message, userData);
 }
 
-void MidiPlayer::sendMessageOutTweaker(
-    const std::vector<unsigned char> *message) {
+void MidiPlayer::sendMessageOutTweaker(const std::vector<unsigned char> *message) {
   if (_midiOutTweaker) {
     _midiOutTweaker->sendMessage(message);
   }
+}
+
+void MidiPlayer::sendMessageOutTweaker(uint8_t byte1, uint8_t byte2, uint8_t byte3) {
+  std::vector<unsigned char> note = {byte1, byte2, byte3};
+  sendMessageOutTweaker(&note);
 }
 
 void MidiPlayer::sendMessageOut(const std::vector<unsigned char> *message) {
   if (_midiOut) {
     _midiOut->sendMessage(message);
   }
+}
+
+void MidiPlayer::sendMessageOut(uint8_t byte1, uint8_t byte2, uint8_t byte3) {
+  std::vector<unsigned char> note = {byte1, byte2, byte3};
+  sendMessageOutTweaker(&note);
 }

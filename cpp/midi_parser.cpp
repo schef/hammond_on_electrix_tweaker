@@ -385,8 +385,7 @@ void MidiParser::parseControlChange(uint8_t byte1, uint8_t byte2) {
 
   case SLIDER_LEFT: {
     printf(FILE_NAME "SLIDER_LEFT %d\n", byte2);
-    std::vector<unsigned char> note1 = {MidiParser::CONTROL_CHANGE, 11, byte2};
-    MidiPlayer::getInstance()->sendMessageOut(&note1);
+    MidiPlayer::getInstance()->sendMessageOut(MidiParser::CONTROL_CHANGE, 11, byte2);
   } break;
 
   case SLIDER_RIGHT:
@@ -395,8 +394,7 @@ void MidiParser::parseControlChange(uint8_t byte1, uint8_t byte2) {
 
   case SLIDER_CENTER: {
     printf(FILE_NAME "SLIDER_CENTER %d\n", byte2);
-    std::vector<unsigned char> note2 = {MidiParser::CONTROL_CHANGE, 1,
-    byte2}; MidiPlayer::getInstance()->sendMessageOut(&note2);
+    MidiPlayer::getInstance()->sendMessageOut(MidiParser::CONTROL_CHANGE, 1, byte2);
   } break;
 
   case ENCODER_HIGH_LEFT:

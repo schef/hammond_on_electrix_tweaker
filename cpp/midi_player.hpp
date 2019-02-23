@@ -21,8 +21,10 @@ class MidiPlayer
   public:
     static MidiPlayer *getInstance();
     void registerCallbackFunction(void (*callbackFunction)(double deltatime, std::vector<unsigned char> *message, void *));
-    void sendMessageOutTweaker( const std::vector<unsigned char> *message );
-    void sendMessageOut( const std::vector<unsigned char> *message );
+    void sendMessageOutTweaker(const std::vector<unsigned char> *message);
+    void sendMessageOutTweaker(uint8_t byte1, uint8_t byte2, uint8_t byte3);
+    void sendMessageOut(const std::vector<unsigned char> *message);
+    void sendMessageOut(uint8_t byte1, uint8_t byte2, uint8_t byte3);
 };
 
 #endif
