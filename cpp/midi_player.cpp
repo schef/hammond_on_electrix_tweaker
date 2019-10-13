@@ -128,5 +128,5 @@ void MidiPlayer::sendMessageOut(const std::vector<unsigned char> *message) {
 
 void MidiPlayer::sendMessageOut(uint8_t byte1, uint8_t byte2, uint8_t byte3) {
   std::vector<unsigned char> note = {byte1, byte2, byte3};
-  sendMessageOutTweaker(&note);
+  sendMessageOut(&note);
 }
