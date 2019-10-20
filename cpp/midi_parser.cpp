@@ -399,26 +399,32 @@ void MidiParser::parseControlChange(uint8_t byte1, uint8_t byte2) {
 
   case ENCODER_HIGH_LEFT:
     printf(FILE_NAME "ENCODER_HIGH_LEFT %d\n", byte2);
+    MidiPlayer::getInstance()->sendMessageOut(MidiParser::CONTROL_CHANGE, 103, 127 - byte2);
     break;
 
   case ENCODER_MID_LEFT:
     printf(FILE_NAME "ENCODER_MID_LEFT %d\n", byte2);
+    MidiPlayer::getInstance()->sendMessageOut(MidiParser::CONTROL_CHANGE, 102, 127 - byte2);
     break;
 
   case ENCODER_LOW_LEFT:
     printf(FILE_NAME "ENCODER_LOW_LEFT %d\n", byte2);
+    MidiPlayer::getInstance()->sendMessageOut(MidiParser::CONTROL_CHANGE, 101, 127 - byte2);
     break;
 
   case ENCODER_HIGH_RIGHT:
     printf(FILE_NAME "ENCODER_HIGH_RIGHT %d\n", byte2);
+    MidiPlayer::getInstance()->sendMessageOut(MidiParser::CONTROL_CHANGE, 104, 127 - byte2);
     break;
 
   case ENCODER_MID_RIGHT:
     printf(FILE_NAME "ENCODER_MID_RIGHT %d\n", byte2);
+    MidiPlayer::getInstance()->sendMessageOut(MidiParser::CONTROL_CHANGE, 105, 127 - byte2);
     break;
 
   case ENCODER_LOW_RIGHT:
     printf(FILE_NAME "ENCODER_LOW_RIGHT %d\n", byte2);
+    MidiPlayer::getInstance()->sendMessageOut(MidiParser::CONTROL_CHANGE, 106, 127 - byte2);
     break;
 
   case POT_LEFT:
