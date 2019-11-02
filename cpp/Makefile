@@ -9,7 +9,7 @@ INCLUDE_PATH += -I./
 INCLUDE_PATH += -I/usr/include/rtmidi/
 
 build:
-	g++ -std=c++17 $(SOURCE_FILE) $(INCLUDE_PATH) `pkg-config --cflags --libs rtmidi` -g -O2 -o main
+	g++ -std=c++17 $(SOURCE_FILE) $(INCLUDE_PATH) `pkg-config --cflags --libs rtmidi` -g -O2 -o ./bin/tweaker
 
 run:
-	./main
+	./bin/tweaker
