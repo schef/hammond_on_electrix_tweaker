@@ -247,6 +247,10 @@ void MidiParser::parseNoteOn(uint8_t byte1, uint8_t byte2) {
 
   case BUTTON_AB_ASSIGN_LEFT:
     printf("BUTTON_AB_ASSIGN_LEFT %d\n", byte2);
+    static bool state = false;
+    state = !state;
+    MidiPlayer::getInstance()->sendMessageOut(MidiParser::CONTROL_CHANGE, 31, state * 127);
+    MidiPlayer::getInstance()->sendMessageOutTweaker(MidiParser::NOTE_ON, MidiParser::BUTTON_AB_ASSIGN_LEFT,state*127);
     break;
 
   case BUTTON_AB_ASSIGN_RIGHT:
