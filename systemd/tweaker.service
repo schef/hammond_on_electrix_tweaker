@@ -1,0 +1,12 @@
+[Unit]
+Description=Hammond On Electrix Tweaker service
+
+[Service]
+ExecStart=/usr/bin/tweaker
+
+[Timer]
+OnUnitInactiveSec=5s
+OnBootSec=5s
+
+[Install]
+WantedBy=multi-user.target
