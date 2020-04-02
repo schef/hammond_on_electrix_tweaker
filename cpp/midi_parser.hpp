@@ -6,7 +6,7 @@
 
 class MidiParser {
 public:
-  enum TweakerStatusByteEnum { NOTE_ON = 144, CONTROL_CHANGE = 176 };
+  enum TweakerStatusByteEnum { NOTE_ON = 144, CONTROL_CHANGE = 176, NOTE_ON_C16 = 159 };
 
   enum TweakerNoteOnEnum {
     BUTTON_ROW1_COL1 = 1,

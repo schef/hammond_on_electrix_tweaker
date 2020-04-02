@@ -347,6 +347,10 @@ void MidiParser::parseNoteOn(uint8_t byte1, uint8_t byte2) {
 
   case BUTTON_TRACK_SELECT:
     printf("BUTTON_TRACK_SELECT %d\n", byte2);
+#define ZYNTHIAN_UI_SELECT 51
+    if (byte2 == 0) {
+      MidiPlayer::getInstance()->sendMessageOutTweaker(MidiParser::NOTE_ON_C16, ZYNTHIAN_US_SELECT, 100);
+    }
     break;
 
   default:
@@ -443,6 +447,15 @@ void MidiParser::parseControlChange(uint8_t byte1, uint8_t byte2) {
 
   case TRACK_SELECT:
     printf(FILE_NAME "TRACK_SELECT %d\n", byte2);
+#define TRACK_SELECT_CLOCKWISE 1
+#define TRACK_SELECT_ANTICLOCKWISE 127
+#define ZYNTHIAN_UI_SELECT_UP 52
+#define ZYNTHIAN_UI_SELECT_DOWN 53
+    if (byte2 == TRACK_SELECT_CLOCKWISE) {
+      MidiPlayer::getInstance()->sendMessageOutTweaker(MidiParser::NOTE_ON_C16, ZYNTHIAN_US_SELECT_DOWN, 100);
+    } else if (byte2 == TRACK_SELECT_ANTICLOCKWISE) {
+      MidiPlayer::getInstance()->sendMessageOutTweaker(MidiParser::NOTE_ON_C16, ZYNTHIAN_US_SELECT_UP, 100);
+    }
     break;
 
   default:
