@@ -9,5 +9,7 @@ jack_disconnect "a2j:Tweaker [20] (capture): Tweaker MIDI 2" "ZynMidiRouter:main
 aconnect 129 20
 aconnect 20 128
 jack_connect "a2j:tweaker [130] (capture): output" "ZynMidiRouter:main_in"
+jack_connect "a2j:tweaker [129] (capture): output" "ZynMidiRouter:main_in"
+jack_connect "a2j:tweaker [128] (capture): output" "ZynMidiRouter:main_in"
 
 exit 0
