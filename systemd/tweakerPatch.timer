@@ -2,8 +2,8 @@
 Description=Hammond On Electrix Tweaker Patch timer
 
 [Timer]
-OnUnitActiveSec=10s
-OnBootSec=10s
+OnUnitActiveSec=2s
+OnBootSec=2s
 
 [Install]
 WantedBy=timers.target
