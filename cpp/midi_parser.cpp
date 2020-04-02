@@ -348,9 +348,7 @@ void MidiParser::parseNoteOn(uint8_t byte1, uint8_t byte2) {
   case BUTTON_TRACK_SELECT:
     printf("BUTTON_TRACK_SELECT %d\n", byte2);
 #define ZYNTHIAN_UI_SELECT 51
-    if (byte2 == 0) {
-      MidiPlayer::getInstance()->sendMessageOut(MidiParser::NOTE_ON_C16, ZYNTHIAN_UI_SELECT, 100);
-    }
+    MidiPlayer::getInstance()->sendMessageOut(MidiParser::NOTE_ON_C16, ZYNTHIAN_UI_SELECT, byte2);
     break;
 
   default:
