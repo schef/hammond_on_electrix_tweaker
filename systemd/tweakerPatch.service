@@ -1,0 +1,6 @@
+[Unit]
+Description=Hammond On Electrix Tweaker Patch service
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash /usr/bin/tweakerPatch.sh

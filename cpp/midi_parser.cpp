@@ -247,6 +247,11 @@ void MidiParser::parseNoteOn(uint8_t byte1, uint8_t byte2) {
 
   case BUTTON_AB_ASSIGN_LEFT:
     printf("BUTTON_AB_ASSIGN_LEFT %d\n", byte2);
+    if (byte2 == 0) return;
+    static bool state = false;
+    state = !state;
+    MidiPlayer::getInstance()->sendMessageOut(MidiParser::CONTROL_CHANGE, 31, state * 127);
+    MidiPlayer::getInstance()->sendMessageOutTweaker(MidiParser::NOTE_ON, MidiParser::BUTTON_AB_ASSIGN_LEFT,state*127);
     break;
 
   case BUTTON_AB_ASSIGN_RIGHT:
@@ -399,32 +404,32 @@ void MidiParser::parseControlChange(uint8_t byte1, uint8_t byte2) {
 
   case ENCODER_HIGH_LEFT:
     printf(FILE_NAME "ENCODER_HIGH_LEFT %d\n", byte2);
-    MidiPlayer::getInstance()->sendMessageOut(MidiParser::CONTROL_CHANGE, 103, 127 - byte2);
+    MidiPlayer::getInstance()->sendMessageOut(MidiParser::CONTROL_CHANGE, 74, 127 - byte2);
     break;
 
   case ENCODER_MID_LEFT:
     printf(FILE_NAME "ENCODER_MID_LEFT %d\n", byte2);
-    MidiPlayer::getInstance()->sendMessageOut(MidiParser::CONTROL_CHANGE, 102, 127 - byte2);
+    MidiPlayer::getInstance()->sendMessageOut(MidiParser::CONTROL_CHANGE, 73, 127 - byte2);
     break;
 
   case ENCODER_LOW_LEFT:
     printf(FILE_NAME "ENCODER_LOW_LEFT %d\n", byte2);
-    MidiPlayer::getInstance()->sendMessageOut(MidiParser::CONTROL_CHANGE, 101, 127 - byte2);
+    MidiPlayer::getInstance()->sendMessageOut(MidiParser::CONTROL_CHANGE, 72, 127 - byte2);
     break;
 
   case ENCODER_HIGH_RIGHT:
     printf(FILE_NAME "ENCODER_HIGH_RIGHT %d\n", byte2);
-    MidiPlayer::getInstance()->sendMessageOut(MidiParser::CONTROL_CHANGE, 104, 127 - byte2);
+    MidiPlayer::getInstance()->sendMessageOut(MidiParser::CONTROL_CHANGE, 75, 127 - byte2);
     break;
 
   case ENCODER_MID_RIGHT:
     printf(FILE_NAME "ENCODER_MID_RIGHT %d\n", byte2);
-    MidiPlayer::getInstance()->sendMessageOut(MidiParser::CONTROL_CHANGE, 105, 127 - byte2);
+    MidiPlayer::getInstance()->sendMessageOut(MidiParser::CONTROL_CHANGE, 76, 127 - byte2);
     break;
 
   case ENCODER_LOW_RIGHT:
     printf(FILE_NAME "ENCODER_LOW_RIGHT %d\n", byte2);
-    MidiPlayer::getInstance()->sendMessageOut(MidiParser::CONTROL_CHANGE, 106, 127 - byte2);
+    MidiPlayer::getInstance()->sendMessageOut(MidiParser::CONTROL_CHANGE, 77, 127 - byte2);
     break;
 
   case POT_LEFT:

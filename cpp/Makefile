@@ -1,4 +1,4 @@
-default: build run
+default: build
 
 SOURCE_FILE += main.cpp
 SOURCE_FILE += midi_player.cpp
